@@ -54,27 +54,27 @@ struct RepositoryImpl: Repository {
         let publisher = options.randomElement()!
         return publisher.mapError { error -> RepositoryError in
             switch error {
-            case is NetworkDataError:
-                let value = (error as! NetworkDataError)
-                switch value {
-                    case .client(let code, let message):
-                        if code == 401 || code == 403 {
-                            return .notAuthorized
-                        }else if code == 404 {
-                            return .noData(message: message)
-                        } else if code == 500 {
-                            return .notAvailable
-                        } else {
-                            return .noFound
-                        }
-                    default : break
-                }
-                return .noData(message: fallbackMessage)
-            case is StorageDataError:
-                return .noFound
-            case is CoreDataError:
-                return .notAvailable
-            default: return .notAvailable
+                case is NetworkDataError:
+                    let value = (error as! NetworkDataError)
+                    switch value {
+                        case .client(let code, let message):
+                            if code == 401 || code == 403 {
+                                return .notAuthorized
+                            }else if code == 404 {
+                                return .noData(message: message)
+                            } else if code == 500 {
+                                return .notAvailable
+                            } else {
+                                return .noFound
+                            }
+                        default : break
+                    }
+                    return .noData(message: fallbackMessage)
+                case is StorageDataError:
+                    return .noFound
+                case is CoreDataError:
+                    return .notAvailable
+                default: return .notAvailable
             }
         }.eraseToAnyPublisher()
     }
@@ -97,6 +97,6 @@ repository.process()
             case .finished: break
             case let .failure(error): print(error)
         }
-        }, receiveValue: { print($0) })
+    }, receiveValue: { print($0) })
     .store(in: &subscriptions)
 
